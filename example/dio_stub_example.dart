@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 // Checkout tests for more examples
 void main() async {
   Dio dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
-  DioStub dioStub = DioStub(dio: dio);
+  DioStub dioStub = DioStub(client: dio);
   
   final responseMap = {'test': 'ok'};
 

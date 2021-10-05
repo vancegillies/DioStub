@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
-      dioStub = DioStub(dio: dio);
+      dioStub = DioStub(client: dio);
     });
 
     test(' - it stubs a simple route', () async {

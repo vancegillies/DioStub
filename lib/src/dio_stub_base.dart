@@ -7,8 +7,6 @@ import 'package:path_tree/path_tree.dart';
 typedef StubHandler = FutureOr<StubResponse> Function(RequestOptions);
 
 class DioStub implements HttpClientAdapter {
-  Dio dio;
-
   bool closed = false;
 
   PathTree<StubHandler> stubs = PathTree<StubHandler>();
@@ -19,8 +17,14 @@ class DioStub implements HttpClientAdapter {
 
   String? _pathGlobVarName;
 
-  DioStub({required this.dio}) {
-    dio.httpClientAdapter = this;
+  DioStub({Dio? client}) {
+    if (client != null) {
+      overrideAdapterFor(client);
+    }
+  }
+
+  overrideAdapterFor(Dio client) {
+    client.httpClientAdapter = this;
   }
 
   void stub(
@@ -56,8 +60,7 @@ class DioStub implements HttpClientAdapter {
       pathParams[pathParam] = requestPathSegments[_pathVarMapping[pathParam]!];
     }
     if (_pathGlobVarMapping != null) {
-      pathParams[_pathGlobVarName!] =
-          requestPathSegments.skip(_pathGlobVarMapping!).join('/');
+      pathParams[_pathGlobVarName!] = requestPathSegments.skip(_pathGlobVarMapping!).join('/');
     }
 
     return pathParams;
@@ -72,9 +75,7 @@ class DioStub implements HttpClientAdapter {
     return handleStubbedRequest(
       makeStubOptions(options),
       getStub(options),
-    )
-        .then((response) => covertToResponse(response))
-        .catchError((error) => throw DioError(requestOptions: options));
+    ).then((response) => covertToResponse(response)).catchError((error) => throw DioError(requestOptions: options));
   }
 
   StubHandler getStub(RequestOptions options) {
